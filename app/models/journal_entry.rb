@@ -1,6 +1,6 @@
 class JournalEntry < ApplicationRecord
-  belongs_to :user
+  belongs_to :journal
   validates :title,   presence: true, length: { minimum: 3, maximum: 50 }
   validates :content, presence: true
-  validates :user_id, presence: true
+  validates :journal_id, presence: true
 end
