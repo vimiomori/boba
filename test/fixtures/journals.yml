@@ -2,12 +2,8 @@
 
 one:
   name: MyString
-  details: MyText
-  done: false
   user: one
 
 two:
   name: MyString
-  details: MyText
-  done: false
   user: two

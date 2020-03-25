@@ -10,36 +10,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_24_055054) do
+ActiveRecord::Schema.define(version: 2020_03_25_034421) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "dailies", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.date "date", null: false
-  end
-
   create_table "journal_entries", force: :cascade do |t|
     t.string "title", null: false
-    t.text "content"
-    t.date "date"
-    t.time "time"
-    t.bigint "user_id", null: false
+    t.text "contents"
+    t.bigint "journal_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_journal_entries_on_user_id"
+    t.index ["journal_id"], name: "index_journal_entries_on_journal_id"
   end
 
-  create_table "to_dos", force: :cascade do |t|
+  create_table "journals", force: :cascade do |t|
     t.string "name", null: false
-    t.text "details"
-    t.boolean "done"
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_to_dos_on_user_id"
+    t.index ["user_id"], name: "index_journals_on_user_id"
+  end
+
+  create_table "log_spreads", force: :cascade do |t|
+    t.integer "type", default: 0, null: false
+    t.bigint "journal_id", null: false
+    t.bigint "parent_log_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["journal_id"], name: "index_log_spreads_on_journal_id"
+    t.index ["parent_log_id"], name: "index_log_spreads_on_parent_log_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "details", null: false
+    t.boolean "done", default: false, null: false
+    t.integer "type", default: 0, null: false
+    t.boolean "repeat", default: false, null: false
+    t.bigint "log_spread_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["log_spread_id"], name: "index_tasks_on_log_spread_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -50,6 +62,8 @@ ActiveRecord::Schema.define(version: 2020_03_24_055054) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  add_foreign_key "journal_entries", "users"
-  add_foreign_key "to_dos", "users"
+  add_foreign_key "journal_entries", "journals"
+  add_foreign_key "journals", "users"
+  add_foreign_key "log_spreads", "log_spreads", column: "parent_log_id"
+  add_foreign_key "tasks", "log_spreads"
 end
