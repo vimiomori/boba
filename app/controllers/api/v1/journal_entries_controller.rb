@@ -1,11 +1,12 @@
 module Api
   module V1
     class JournalEntriesController < ApplicationController
+      before_action :authorize_access_request!
       before_action :set_journal_entry, only: [:show, :update, :destroy]
 
       # GET /journal_entries
       def index
-        @journal_entries = JournalEntry.all
+        @journal_entries = @current_user.journals.journal_entries.all
 
         render json: @journal_entries
       end
@@ -17,7 +18,7 @@ module Api
 
       # POST /journal_entries
       def create
-        @journal_entry = JournalEntry.new(journal_entry_params)
+        @journal_entry = @current_user.journals.jourunal_entries.build(journal_entry_params)
 
         if @journal_entry.save
           render json: @journal_entry, status: :created, location: @journal_entry
@@ -43,12 +44,12 @@ module Api
       private
         # Use callbacks to share common setup or constraints between actions.
         def set_journal_entry
-          @journal_entry = JournalEntry.find(params[:id])
+          @journal_entry = @current_user.journals.journal_entries.find(params[:id])
         end
 
         # Only allow a trusted parameter "white list" through.
         def journal_entry_params
-          params.require(:journal_entry).permit(:title, :content, :date, :time, :user_id)
+          params.require(:journal_entry).permit(:title, :content, :date, :time, :journal_id)
         end
     end
   end
